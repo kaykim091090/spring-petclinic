@@ -17,6 +17,8 @@ pipeline {
     stage('Docker Build') {
       agent any
       steps {
+        // Since ./ will be the internal docker instance, moving the target JAR to ./
+        sh 'cp /var/jenkins_home/workspace/kkim-petclinic-pipe/target/spring-petclinic-2.4.5.jar ./'
         // Build with Dockerfile
         sh 'docker build -t petclinic-jar -f ./Dockerfile .'
       }
