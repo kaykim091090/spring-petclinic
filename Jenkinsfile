@@ -29,7 +29,7 @@ pipeline {
         // Since ./ will be the internal docker instance, moving the target JAR to ./
         sh 'cp /var/jenkins_home/workspace/kkim-petclinic-pipe/target/spring-petclinic-2.4.5.jar ./'
         // Build with Dockerfile
-        sh 'docker build -t petclinic-jar -f ./Dockerfile .'
+        sh 'docker build -t kaykim091090/petclinic-jar -f ./Dockerfile .'
       }
       post {
         success {
