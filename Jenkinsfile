@@ -6,12 +6,14 @@ pipeline {
         jdk 'jdk8' 
   }
   stages {
-    stage('Build') {
+    stage('Maven Build') {
       steps {
         echo 'Start building'
-        git 'https://github.com/kaykim091090/spring-petclinic.git'
+        // Already provided via Jenkins SCM
+        // git 'https://github.com/kaykim091090/spring-petclinic.git'
         // Testing before mvnw
-        sh 'mvn -Dmaven.test.failure.ignore=true install'
+        // sh 'mvn -Dmaven.test.failure.ignore=true install'
+        sh './mvnw package'
       }
     }
     stage('Docker Build') {
