@@ -1,3 +1,61 @@
+# Forked Spring PetClinic Jenkins Pipe Assignment [![Build Status](https://travis-ci.org/spring-projects/spring-petclinic.png?branch=main)](https://travis-ci.org/spring-projects/spring-petclinic/)
+
+## Prerequisites on Windows 10 Home Edition
+* Install Docker Desktop (https://www.docker.com/products/docker-desktop)
+* Install Java (Version 8 in my case)
+* Install Maven (Version 3.8.1 in my case)
+* Install Git (https://git-scm.com/download/win)
+* Install Cygwin (https://cygwin.com/install.html)
+
+## Steps
+1) Pull Jenkins image (I used verion lts) from DockerHub to local (at Cygwin)
+    ```
+    docker image pull jenkins/jenkins:lts 
+    ```
+
+2) Create a Docker volume to persist Jenkins data
+    ```
+    docker volume create jfrog-kkim-volume2
+    ```
+3) Create a Docker container with the image and volume above. I created another container (50000:50000) within the container to ensure Jenkins can build maven from its executing container. 
+    ```
+    docker run -v /var/run/docker.sock:/var/run/docker.sock -v jfrog-kkim-volume2:/var/jenkins_home \ 
+    -p 8100:8080 -p 50000:50000 --name jfrog-kkim-container3 jenkins/jenkins:lts
+    ```
+4) To make sure the Jenkins container can talk to Docker socket to inner mvn-build, I installed "docker.io" as well as elevated the user "jenkins" to "docker" user group. Also, modified a permission of the socket file for "jenkins".
+    ```
+    docker exec -it -u 0 jfrog-kkim-container2 bash # Getting Root-access bash
+    apt-get update && apt-get install -y docker.io 
+    groupadd docker
+    usermod -aG docker jenkins
+    chmod 666 /var/run/docker.sock
+    ```
+5) Restart the container
+6) Install Jenkins plugins for Maven and Docker
+7) Setup a Jenkins Pipeline with the GitHub forced source "https://github.com/kaykim091090/spring-petclinic"
+8) Build (with Jenkinsfile at the GitHub)
+9) Upon success, #8 produces a local docker image file of the Spring PetClinic JAR
+10) Create a local container with the image to test
+    ```
+    docker run -v /var/run/docker.sock:/var/run/docker.sock -v jfrog-kkim-volume3:/var/jenkins_home -p 8888:8888 --name jfrog-kkim-petclinic kaykim091090/petclinic-jar:latest
+    ```
+11) TA-DA. Your PetClinic is on your browser (http://localhost:8888/) now! 
+
+## Issues Encountered (& Resolved)
+1) Windows is not the best environment to run Jenkins as-it-is, so I ran it on the localhost/Docker.
+Since Jenkins is already running on the container, it had various problems, such as not finding maven installed in one container or not able to build since it could not find another container to execute. After resarching, I followed the solution found on the DockerHub Community Forum. 
+2) Since the port 8080 was already occupied, I could not see the expecting homepage when I ran PetClinic JAR or Docker Image. That was resolved by changing the embedded tomcat port parameter in Dockerfile when we run the JAR. 
+
+## Deliverables
+1) GitHub repo: https://github.com/kaykim091090/spring-petclinic
+    - https://github.com/kaykim091090/spring-petclinic/blob/master/Jenkinsfile
+     - https://github.com/kaykim091090/spring-petclinic/blob/master/Dockerfile
+
+2) DockerHub repo: https://hub.docker.com/r/kaykim091090/petclinic-jar
+#
+#
+#
+---
 # Spring PetClinic Sample Application [![Build Status](https://travis-ci.org/spring-projects/spring-petclinic.png?branch=main)](https://travis-ci.org/spring-projects/spring-petclinic/)
 
 ## Understanding the Spring Petclinic application with a few diagrams
