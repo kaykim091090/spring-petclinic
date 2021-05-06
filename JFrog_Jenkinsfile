@@ -1,0 +1,40 @@
+node {
+    def server
+    def rtMaven = Artifactory.newMavenBuild()
+    def buildInfo
+
+    stage ('Clone') {
+        git url: 'https://github.com/kaykim091090/spring-petclinic.git'
+    }
+
+    stage ('Artifactory configuration') {
+        // Obtain an Artifactory server instance, defined in Jenkins --> Manage Jenkins --> Configure System:
+        server = Artifactory.server 'artifactory'
+
+        // Tool name from Jenkins configuration
+        rtMaven.tool = 'maven3'
+        rtMaven.deployer releaseRepo: 'default-maven-virtual', snapshotRepo: 'default-maven-virtual', server: server
+        rtMaven.resolver releaseRepo: 'default-maven-virtual', snapshotRepo: 'default-maven-virtual', server: server
+        // rtMaven.deployer releaseRepo: ARTIFACTORY_LOCAL_RELEASE_REPO, snapshotRepo: ARTIFACTORY_LOCAL_SNAPSHOT_REPO, server: server
+        // rtMaven.resolver releaseRepo: ARTIFACTORY_VIRTUAL_RELEASE_REPO, snapshotRepo: ARTIFACTORY_VIRTUAL_SNAPSHOT_REPO, server: server
+        
+        buildInfo = Artifactory.newBuildInfo()
+        buildInfo.env.capture = true
+    }
+
+    stage ('Maven Build') {
+        rtMaven.run pom: 'pom.xml', goals: 'clean install', buildInfo: buildInfo
+    }
+    
+    stage ('Build Docker Image') {
+        // Since ./ will be the internal docker instance, moving the target JAR to ./
+        sh 'cp /var/jenkins_home/workspace/kkim-jfrog-pipe-artifactory/target/spring-petclinic-2.4.5.jar ./'
+        // Build with Dockerfile
+        sh 'docker build -t kaykim091090/petclinic:jfrog -f ./Dockerfile .'
+        // Built the image kaykim091090/petclinic:jfrog
+    }
+
+    stage ('Publish build info') {
+        server.publishBuildInfo buildInfo
+    }
+}
