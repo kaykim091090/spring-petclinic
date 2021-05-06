@@ -42,6 +42,19 @@
     ```
 11) TA-DA. Your PetClinic is on your browser (http://localhost:8888/) now! 
 
+12) [Extra] To enable Jenkins Pipe - Jfrog Artifactory Integration
+I created this scenario as a different Docker image & container to separate out from above. 
+    ```
+    https://www.jfrog.com/confluence/display/JFROG/Configuring+Jenkins+Artifactory+Plug-in
+    https://www.jfrog.com/confluence/display/JFROG/Jenkins+Artifactory+Plug-in
+    https://github.com/jfrog/project-examples/blob/master/jenkins-examples
+                                /pipeline-examples/scripted-examples/maven-example/Jenkinsfile
+    ```
+    "Jenkinsfile" for this scenario was added to:
+    ```
+    https://github.com/kaykim091090/spring-petclinic/blob/master/JFrog_Jenkinsfile
+    ```
+
 ## Issues Encountered (& Resolved)
 1) Windows is not the best environment to run Jenkins as-it-is, so I ran it on the localhost/Docker.
 Since Jenkins is already running on the container, it had various problems, such as not finding maven installed in one container or not able to build since it could not find another container to execute. After resarching, I followed the solution found on the DockerHub Community Forum. 
