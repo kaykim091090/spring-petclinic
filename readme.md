@@ -37,7 +37,8 @@
 9) Upon success, #8 produces a local docker image file of the Spring PetClinic JAR
 10) Create a local container with the image to test
     ```
-    docker run -v /var/run/docker.sock:/var/run/docker.sock -v jfrog-kkim-volume3:/var/jenkins_home -p 8888:8888 --name jfrog-kkim-petclinic kaykim091090/petclinic-jar:latest
+    docker run -v /var/run/docker.sock:/var/run/docker.sock -v jfrog-kkim-volume3:/var/jenkins_home \
+    -p 8888:8888 --name jfrog-kkim-petclinic kaykim091090/petclinic-jar:latest
     ```
 11) TA-DA. Your PetClinic is on your browser (http://localhost:8888/) now! 
 
